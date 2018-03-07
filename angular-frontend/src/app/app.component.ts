@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Event } from './event'
+import { Pageview } from './pageview'
 
 @Component({
   selector: 'app-root',
@@ -10,12 +10,15 @@ import { Event } from './event'
 })
 export class AppComponent {
   title = 'Streem Technical Test';
-  events: Event[];
+  pageviews: Pageview[];
   backendUrl: string = 'http://localhost:3000/';
 
   constructor(private http: HttpClient) {
-    let url = this.backendUrl + 'events.json'
+    let url = this.backendUrl + 'page_views'
     this.http.get(url)
-      .subscribe( (res:Event[]) => this.events = res);
+      .subscribe( (res:Pageview[]) => {
+        console.log(res);
+        this.pageviews = res;
+      });
   }
 }
