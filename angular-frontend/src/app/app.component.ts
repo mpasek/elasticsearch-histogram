@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Pageview } from './pageview'
+import { Pageview } from './pageview';
+import * as Plotly from 'plotly.js';
+import {Config, Data, Layout} from 'plotly.js';
 
 @Component({
   selector: 'app-root',
@@ -105,6 +107,7 @@ export class AppComponent {
       .subscribe( (res) => {
         console.log(res);
         this.resInfo = res;
+        this.drawHistogram();
       });
   }
 
@@ -134,7 +137,6 @@ export class AppComponent {
     console.log(this.interval);
   }
 
-
   getHistogramInfo(urls: Array<string>, startTime: number, endTime: number, interval: string) {
     let url = this.backendUrl + 'page_views';
     let data = {
@@ -145,6 +147,37 @@ export class AppComponent {
     };
     
     return this.http.post(url, {page_view: data});
+  }
+
+
+
+  drawHistogram() {
+    var x1 = [];
+    var x2 = [];
+    for (var i = 0; i < 500; i ++) {
+      x1[i] = Math.random();
+      x2[i] = Math.random();
+    }
+
+    var trace1 = {
+      x: x1,
+      type: "histogram",
+    };
+    var trace2 = {
+      x: x2,
+      type: "histogram",
+    };
+    var data = [trace1, trace2];
+    var layout = {
+      barmode: "stack",
+      bargap: 0.05, 
+      bargroupgap: 0.2,
+      title: "Sampled Results", 
+      xaxis: {title: "Value"}, 
+      yaxis: {title: "Count"}
+    };
+    Plotly.newPlot("chart", data, layout);
+
   }
 
 }
