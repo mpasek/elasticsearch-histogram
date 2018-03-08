@@ -80,6 +80,11 @@ class PageViewsController < ApplicationController
                       to: @end_time
                     }
                   }
+                },
+                filter: {
+                  terms:  { 
+                    page_url: @urls
+                  }
                 }
               }
             },
@@ -93,8 +98,7 @@ class PageViewsController < ApplicationController
                 aggregations: {
                   url_bucket: {
                     terms: {
-                      field: "page_url",
-                      size: 5
+                      field: "page_url"
                     }
                   }
                 }

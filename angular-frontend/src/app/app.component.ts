@@ -82,9 +82,9 @@ export class AppComponent {
   convertToMilli(time): number {
     let hour = time.substring(0,2);
     hour = parseInt(hour);
-    console.log(hour);
 
     let date = new Date(2017, 5, 1, hour, 0, 0, 0);
+    console.log(date);
     let dateInMil = date.getTime();
     return dateInMil;
   }
@@ -106,7 +106,7 @@ export class AppComponent {
   }
 
   calculateInterval() {
-    return "10m"
+    return "30m"
   }
 
 
