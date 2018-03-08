@@ -113,13 +113,13 @@ export class AppComponent {
   getHistogramInfo(urls: Array<string>, startTime: number, endTime: number, interval) {
     let url = this.backendUrl + 'page_views';
     let data = {
-      "urls": urls,
-      "startTime": startTime,
-      "endTime": endTime,
-      "interval": interval
+      urls: urls,
+      startTime: startTime,
+      endTime: endTime,
+      interval: interval
     };
-    let jsonData = {page_view: JSON.stringify(data)};
-    return this.http.post(url, jsonData);
+    
+    return this.http.post(url, {page_view: data});
   }
 
 }

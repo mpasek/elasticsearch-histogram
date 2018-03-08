@@ -53,19 +53,18 @@ class PageViewsController < ApplicationController
   def create
     @request_data = params[:page_view]
 
-    info = request.raw_post
-    parsed_data = JSON.parse(info)
-    puts parsed_data
+    @urls = params[:page_view][:urls]
+    @start_time = params[:page_view][:startTime]
+    @end_time = params[:page_view][:endTime]
+    @interval = params[:page_view][:interval]
 
-    urls = parsed_data["urls"]
-    start_time = parsed_data["startTime"]
-    @end_time = params[:page_view]["endTime"]
-    @interval = params[:page_view]["interval"]
-
-    puts urls
-    puts start_time
+    puts @request_data
+    puts @urls
+    puts @start_time
     puts @end_time
     puts @interval
+
+    
     
 
     client = Elasticsearch::Client.new url: 'http://elastic:streem@test.es.streem.com.au:9200'
@@ -77,8 +76,8 @@ class PageViewsController < ApplicationController
                 must:{
                   range: {
                     derived_tstamp: {
-                      from: 1496293200000,
-                      to: 1496300400000
+                      from: @start_time,
+                      to: @end_time
                     }
                   }
                 }
@@ -89,7 +88,7 @@ class PageViewsController < ApplicationController
               time_bucket: {
                 date_histogram: {
                   field: "derived_tstamp",
-                  interval: "10m"
+                  interval: @interval
                 },
                 aggregations: {
                   url_bucket: {
