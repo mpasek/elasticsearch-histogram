@@ -7,27 +7,40 @@ class PageViewsController < ApplicationController
   def index
     client = Elasticsearch::Client.new url: 'http://elastic:streem@test.es.streem.com.au:9200'
 
-    response = client.search index: 'events', 
-        body: { 
-            aggregations: {
-                time_ranges: {
-                    range: {
-                        field: "derived_tstamp",
-                        ranges: [
-                            { from: "2017-06-01T15:00:00.000Z", to: "2017-06-01T15:30:00.000Z"},
-                            { from: "2017-06-01T15:31:00.000Z", to: "2017-06-01T16:00:00.000Z"}
-                        ]
-                    },
-                    aggregations: {
-                        url_bucket: {
-                            terms: {
-                                field: "page_url",
-                                size: 5
-                            }
-                        }
+    response = client.search index: 'events',
+        body: {
+            query: {
+              bool: {
+                must:{
+                  range: {
+                    derived_tstamp: {
+                      from: 1496293200000,
+                      to: 1496300400000
                     }
+                  }
                 }
+              }
+            },
+            
+            aggregations: {
+              time_bucket: {
+                date_histogram: {
+                  field: "derived_tstamp",
+                  interval: "10m"
+                },
+                aggregations: {
+                  url_bucket: {
+                    terms: {
+                      field: "page_url",
+                      size: 5
+                    }
+                  }
+                }
+              }
+              
             }
+          
+          
         }
 
     @page_views = response
@@ -35,35 +48,72 @@ class PageViewsController < ApplicationController
     render json: @page_views
   end
 
-  # GET /page_views/1
-  def show
-    render json: @page_view
-  end
 
   # POST /page_views
   def create
-    @page_view = PageView.new(page_view_params)
+    @request_data = params[:page_view]
 
-    if @page_view.save
-      render json: @page_view, status: :created, location: @page_view
-    else
-      render json: @page_view.errors, status: :unprocessable_entity
-    end
+    info = request.raw_post
+    parsed_data = JSON.parse(info)
+    puts parsed_data
+
+    urls = parsed_data["urls"]
+    start_time = parsed_data["startTime"]
+    @end_time = params[:page_view]["endTime"]
+    @interval = params[:page_view]["interval"]
+
+    puts urls
+    puts start_time
+    puts @end_time
+    puts @interval
+    
+
+    client = Elasticsearch::Client.new url: 'http://elastic:streem@test.es.streem.com.au:9200'
+
+    response = client.search index: 'events',
+        body: {
+            query: {
+              bool: {
+                must:{
+                  range: {
+                    derived_tstamp: {
+                      from: 1496293200000,
+                      to: 1496300400000
+                    }
+                  }
+                }
+              }
+            },
+            
+            aggregations: {
+              time_bucket: {
+                date_histogram: {
+                  field: "derived_tstamp",
+                  interval: "10m"
+                },
+                aggregations: {
+                  url_bucket: {
+                    terms: {
+                      field: "page_url",
+                      size: 5
+                    }
+                  }
+                }
+              }
+              
+            }
+          
+          
+        }
+
+    @response = response
+
+    render json: @response
+
+    
   end
 
-  # PATCH/PUT /page_views/1
-  def update
-    if @page_view.update(page_view_params)
-      render json: @page_view
-    else
-      render json: @page_view.errors, status: :unprocessable_entity
-    end
-  end
-
-  # DELETE /page_views/1
-  def destroy
-    @page_view.destroy
-  end
+  
 
   private
     # Use callbacks to share common setup or constraints between actions.

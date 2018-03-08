@@ -20,18 +20,19 @@ export class AppComponent {
   endStr: string;
   startTime: number;
   endTime: number;
+  resInfo: any;
   
 
   constructor(private http: HttpClient) {
     this.addUrlDefaults();
     this.populateTimes();
 
-    let url = this.backendUrl + 'page_views'
+    /* let url = this.backendUrl + 'page_views'
     this.http.get(url)
       .subscribe( (res:Pageview[]) => {
         console.log(res);
         this.pageviews = res;
-      });
+      }); */
   }
 
   addUrlDefaults() {
@@ -69,12 +70,12 @@ export class AppComponent {
   }
 
   setStart() {
-    let element = document.getElementById("start");
+    let element = document.getElementById("start") as HTMLSelectElement;
     this.startStr = element.options[ element.selectedIndex ].value;
   }
 
   setEnd() {
-    let element = document.getElementById("end");
+    let element = document.getElementById("end") as HTMLSelectElement;
     this.endStr = element.options[ element.selectedIndex ].value;
   }
 
@@ -83,20 +84,42 @@ export class AppComponent {
     hour = parseInt(hour);
     console.log(hour);
 
-    let date = new Date(2017, 6, 1, hour, 0, 0, 0);
+    let date = new Date(2017, 5, 1, hour, 0, 0, 0);
     let dateInMil = date.getTime();
     return dateInMil;
   }
 
   generateHistogram() {
     console.log(this.urls);
-    console.log(this.startStr);
-    console.log(this.endStr);
     this.startTime = this.convertToMilli(this.startStr);
     this.endTime = this.convertToMilli(this.endStr);
     console.log(this.startTime);
     console.log(this.endTime);
+
+    let interval = this.calculateInterval();
+
+    this.getHistogramInfo(this.urls, this.startTime, this.endTime, interval)
+      .subscribe( (res) => {
+        console.log(res);
+        this.resInfo = res;
+      });
   }
 
+  calculateInterval() {
+    return "10m"
+  }
+
+
+  getHistogramInfo(urls: Array<string>, startTime: number, endTime: number, interval) {
+    let url = this.backendUrl + 'page_views';
+    let data = {
+      "urls": urls,
+      "startTime": startTime,
+      "endTime": endTime,
+      "interval": interval
+    };
+    let jsonData = {page_view: JSON.stringify(data)};
+    return this.http.post(url, jsonData);
+  }
 
 }
