@@ -3,56 +3,9 @@ require 'elasticsearch'
 class PageViewsController < ApplicationController
   before_action :set_page_view, only: [:show, :update, :destroy]
 
-  # GET /page_views
-  def index
-    client = Elasticsearch::Client.new url: 'http://elastic:streem@test.es.streem.com.au:9200'
-
-    response = client.search index: 'events',
-        body: {
-            query: {
-              bool: {
-                must:{
-                  range: {
-                    derived_tstamp: {
-                      from: 1496293200000,
-                      to: 1496300400000
-                    }
-                  }
-                }
-              }
-            },
-            
-            aggregations: {
-              time_bucket: {
-                date_histogram: {
-                  field: "derived_tstamp",
-                  interval: "10m"
-                },
-                aggregations: {
-                  url_bucket: {
-                    terms: {
-                      field: "page_url",
-                      size: 5
-                    }
-                  }
-                }
-              }
-              
-            }
-          
-          
-        }
-
-    @page_views = response
-
-    render json: @page_views
-  end
-
-
   # POST /page_views
   def create
     @request_data = params[:page_view]
-
     @urls = params[:page_view][:urls]
     @start_time = params[:page_view][:startTime]
     @end_time = params[:page_view][:endTime]
@@ -63,9 +16,6 @@ class PageViewsController < ApplicationController
     puts @start_time
     puts @end_time
     puts @interval
-
-    
-    
 
     client = Elasticsearch::Client.new url: 'http://elastic:streem@test.es.streem.com.au:9200'
 
@@ -109,14 +59,8 @@ class PageViewsController < ApplicationController
           
         }
 
-    @response = response
-
-    render json: @response
-
-    
+    render json: response    
   end
-
-  
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -128,4 +72,5 @@ class PageViewsController < ApplicationController
     def page_view_params
       params.require(:page_view).permit(:url, :views)
     end
+
 end
