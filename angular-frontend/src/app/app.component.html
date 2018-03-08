@@ -1,13 +1,63 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    {{ title }}
-  </h1>
+<div class="container">
+
+  <div class="row">
+    <div class="col" style="padding-top: 40px; padding-bottom:50px; text-align:center">
+      <h1>{{title}}</h1><hr>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-4">
+      <h2>Options</h2><hr>
+
+      <div class="module">
+        <h5>URLs</h5>
+
+        <form (submit)="addUrl()">
+          <input [(ngModel)]="newUrl" name="newUrl" placeholder="Add URL">
+          <button type="submit" class="btn btn-outline-primary">Add</button>
+        </form><br>
+          
+        <ul>
+          <li *ngFor="let url of urls">{{url}} 
+            <br>
+            <button type="submit" class="btn btn-outline-danger btn-sm" (click)="removeUrl(url)">Remove</button>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="module">
+        <h5>Timeframe</h5>
+        <p class="instructions text-muted">Select a timeframe for June 1, 2017</p>
+        
+          <span>
+            <div class="form-group">
+              <select id="start" class="custom-select" (change)="setStart(this)">
+                <option selected="">From</option>
+                <option *ngFor="let time of times">{{time}}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <select id="end" class="custom-select" (change)="setEnd()">
+                <option selected="">To</option>
+                <option *ngFor="let time of times">{{time}}</option>
+              </select>
+            </div>
+          </span>
+      </div>
+
+      <div class="module" style="padding-bottom: 100px">
+        <button type="submit" class="btn btn-primary btn-lg btn-block" (click)="generateHistogram()">Create Histogram</button>
+      </div>
+      
+    </div>
+
+
+    <div class="col-8">
+      <h2>URL Histogram</h2><hr>
+
+      <div id="chart">{{ pageviews }}</div>
+    </div>
+  </div>
+
 </div>
-
-<h2>URL Histogram</h2>
-<div>{{ pageviews }}</div>
-
-
-
-

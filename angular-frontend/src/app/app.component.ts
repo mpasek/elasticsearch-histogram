@@ -8,17 +8,85 @@ import { Pageview } from './pageview'
   styleUrls: ['./app.component.css'],
   providers: [HttpClient]
 })
+
 export class AppComponent {
   title = 'Streem Technical Test';
-  pageviews: Pageview[];
   backendUrl: string = 'http://localhost:3000/';
+  pageviews: Array<Pageview> = [];
+  newUrl: string = '';
+  urls: Array<string> = [];
+  times: Array<any> = [];
+  startTime: string;
+  endTime: string;
+  
 
   constructor(private http: HttpClient) {
+    this.addUrlDefaults();
+    this.populateTimes();
+
     let url = this.backendUrl + 'page_views'
     this.http.get(url)
       .subscribe( (res:Pageview[]) => {
         console.log(res);
         this.pageviews = res;
       });
+
+    this.generateHistogram();
   }
+
+  addUrlDefaults() {
+    this.urls.push("http://www.news.com.au/travel/travel-updates/incidents/disruptive-passenger-grounds-flight-after-storming-cockpit/news-story/5949c1e9542df41fb89e6cdcdc16b615");
+    this.urls.push("http://www.smh.com.au/sport/tennis/an-open-letter-from-martina-navratilova-to-margaret-court-arena-20170601-gwhuyx.html");
+    this.urls.push("http://www.smh.com.au/nsw/premier-gladys-berejiklian-announces-housing-affordability-reforms-20170601-gwi0jn.html");
+    this.urls.push("http://www.news.com.au/technology/environment/trump-pulls-us-out-of-paris-climate-agreement/news-story/f5c30a07c595a10a81d67611d0515a0a");
+  }
+
+  addUrl(): boolean {
+    if(this.newUrl) {
+      this.urls.push(this.newUrl);
+    }
+    this.newUrl = '';
+    return false;
+  }
+
+  removeUrl(url): boolean {
+    var index = this.urls.indexOf(url);
+    this.urls.splice(index, 1);
+    return false;
+  }
+
+  populateTimes() {
+    var hours, minutes, ampm, time;
+    for (var i = 0; i <= 1450; i += 60) {
+        hours = Math.floor(i / 60);
+        minutes = i % 60;
+        if (minutes < 10) {
+            minutes = '0' + minutes;
+        }
+        time = hours.toString() + ':' + minutes.toString();
+        this.times.push(time);
+    }
+  }
+
+  setStart() {
+    var element = document.getElementById("start");
+    this.startTime = element.options[ element.selectedIndex ].value;
+  }
+
+  setEnd() {
+    var element = document.getElementById("end");
+    this.endTime = element.options[ element.selectedIndex ].value;
+  }
+
+  convertToMilli(start, end) {
+
+  }
+
+  generateHistogram() {
+    console.log(this.urls);
+    console.log(this.startTime);
+    console.log(this.endTime);
+  }
+
+
 }
