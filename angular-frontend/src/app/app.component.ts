@@ -16,10 +16,11 @@ export class AppComponent {
   newUrl: string = '';
   urls: Array<string> = [];
   times: Array<any> = [];
-  startStr: string;
-  endStr: string;
+  startNum: number;
+  endNum: number;
   startTime: number;
   endTime: number;
+  interval: string;
   resInfo: any;
   
 
@@ -71,18 +72,17 @@ export class AppComponent {
 
   setStart() {
     let element = document.getElementById("start") as HTMLSelectElement;
-    this.startStr = element.options[ element.selectedIndex ].value;
+    let startStr = element.options[ element.selectedIndex ].value;
+    this.startNum = parseInt(startStr.substring(0,2));
   }
 
   setEnd() {
     let element = document.getElementById("end") as HTMLSelectElement;
-    this.endStr = element.options[ element.selectedIndex ].value;
+    let endStr = element.options[ element.selectedIndex ].value;
+    this.endNum = parseInt(endStr.substring(0,2));
   }
 
-  convertToMilli(time): number {
-    let hour = time.substring(0,2);
-    hour = parseInt(hour);
-
+  convertToMilli(hour): number {
     let date = new Date(2017, 5, 1, hour, 0, 0, 0);
     console.log(date);
     let dateInMil = date.getTime();
@@ -90,27 +90,52 @@ export class AppComponent {
   }
 
   generateHistogram() {
-    console.log(this.urls);
-    this.startTime = this.convertToMilli(this.startStr);
-    this.endTime = this.convertToMilli(this.endStr);
+    this.validateTimeRange();
+    console.log(this.startNum);
+    console.log(this.endNum);
+
+    this.startTime = this.convertToMilli(this.startNum);
+    this.endTime = this.convertToMilli(this.endNum);
     console.log(this.startTime);
     console.log(this.endTime);
 
-    let interval = this.calculateInterval();
+    this.calculateInterval(this.startNum, this.endNum);
 
-    this.getHistogramInfo(this.urls, this.startTime, this.endTime, interval)
+    this.getHistogramInfo(this.urls, this.startTime, this.endTime, this.interval)
       .subscribe( (res) => {
         console.log(res);
         this.resInfo = res;
       });
   }
 
-  calculateInterval() {
-    return "30m"
+  validateTimeRange() {
+    if(this.startNum <= this.endNum) {
+      return;
+    } else {
+      let temp = this.startNum;
+      this.startNum = this.endNum;
+      this.endNum = temp;
+    }
+  }
+
+  calculateInterval(start, end) {
+    let diff = end - start;
+    if(diff < 5) {
+      this.interval = "10m";
+    } else if(diff >= 5 && diff < 7) {
+      this.interval = "15m";
+    } else if(diff >= 7 && diff < 9) {
+      this.interval = "20m";
+    } else if(diff >= 9 && diff < 13) {
+      this.interval = "30m";
+    } else {
+      this.interval = "1h"
+    }
+    console.log(this.interval);
   }
 
 
-  getHistogramInfo(urls: Array<string>, startTime: number, endTime: number, interval) {
+  getHistogramInfo(urls: Array<string>, startTime: number, endTime: number, interval: string) {
     let url = this.backendUrl + 'page_views';
     let data = {
       urls: urls,
