@@ -16,8 +16,10 @@ export class AppComponent {
   newUrl: string = '';
   urls: Array<string> = [];
   times: Array<any> = [];
-  startTime: string;
-  endTime: string;
+  startStr: string;
+  endStr: string;
+  startTime: number;
+  endTime: number;
   
 
   constructor(private http: HttpClient) {
@@ -30,8 +32,6 @@ export class AppComponent {
         console.log(res);
         this.pageviews = res;
       });
-
-    this.generateHistogram();
   }
 
   addUrlDefaults() {
@@ -50,7 +50,7 @@ export class AppComponent {
   }
 
   removeUrl(url): boolean {
-    var index = this.urls.indexOf(url);
+    let index = this.urls.indexOf(url);
     this.urls.splice(index, 1);
     return false;
   }
@@ -69,21 +69,31 @@ export class AppComponent {
   }
 
   setStart() {
-    var element = document.getElementById("start");
-    this.startTime = element.options[ element.selectedIndex ].value;
+    let element = document.getElementById("start");
+    this.startStr = element.options[ element.selectedIndex ].value;
   }
 
   setEnd() {
-    var element = document.getElementById("end");
-    this.endTime = element.options[ element.selectedIndex ].value;
+    let element = document.getElementById("end");
+    this.endStr = element.options[ element.selectedIndex ].value;
   }
 
-  convertToMilli(start, end) {
+  convertToMilli(time): number {
+    let hour = time.substring(0,2);
+    hour = parseInt(hour);
+    console.log(hour);
 
+    let date = new Date(2017, 6, 1, hour, 0, 0, 0);
+    let dateInMil = date.getTime();
+    return dateInMil;
   }
 
   generateHistogram() {
     console.log(this.urls);
+    console.log(this.startStr);
+    console.log(this.endStr);
+    this.startTime = this.convertToMilli(this.startStr);
+    this.endTime = this.convertToMilli(this.endStr);
     console.log(this.startTime);
     console.log(this.endTime);
   }
