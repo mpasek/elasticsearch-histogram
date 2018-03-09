@@ -33,7 +33,7 @@ class PageViewsController < ApplicationController
                 },
                 filter: {
                   terms:  { 
-                    page_url: @urls
+                    page_url: @urls, 
                   }
                 }
               }
@@ -43,7 +43,12 @@ class PageViewsController < ApplicationController
               time_bucket: {
                 date_histogram: {
                   field: "derived_tstamp",
-                  interval: @interval
+                  interval: @interval,
+                  min_doc_count: 0,
+                  extended_bounds: {
+                    min: @start_time,
+                    max: @end_time
+                  }
                 },
                 aggregations: {
                   url_bucket: {

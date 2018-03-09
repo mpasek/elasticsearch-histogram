@@ -42,7 +42,6 @@ export class AppComponent {
     this.urls.push("http://www.news.com.au/travel/travel-updates/incidents/disruptive-passenger-grounds-flight-after-storming-cockpit/news-story/5949c1e9542df41fb89e6cdcdc16b615");
     this.urls.push("http://www.smh.com.au/sport/tennis/an-open-letter-from-martina-navratilova-to-margaret-court-arena-20170601-gwhuyx.html");
     this.urls.push("http://www.smh.com.au/nsw/premier-gladys-berejiklian-announces-housing-affordability-reforms-20170601-gwi0jn.html");
-    this.urls.push("http://www.news.com.au/technology/environment/trump-pulls-us-out-of-paris-climate-agreement/news-story/f5c30a07c595a10a81d67611d0515a0a");
   }
 
   addUrl(): boolean {
@@ -85,21 +84,19 @@ export class AppComponent {
   }
 
   convertToMilli(hour): number {
-    let date = new Date(2017, 5, 1, hour, 0, 0, 0);
-    console.log(date);
-    let dateInMil = date.getTime();
+    var utcDate = new Date(Date.UTC(2017, 5, 1, hour, 0, 0));
+    console.log('utc date: ' + utcDate);
+    let dateInMil = utcDate.getTime();
     return dateInMil;
   }
 
   generateHistogram() {
     this.validateTimeRange();
-    console.log(this.startNum);
-    console.log(this.endNum);
 
     this.startTime = this.convertToMilli(this.startNum);
     this.endTime = this.convertToMilli(this.endNum);
-    console.log(this.startTime);
-    console.log(this.endTime);
+    console.log('start time in milli: ' + this.startTime);
+    console.log('end time in milli: ' + this.endTime);
 
     this.calculateInterval(this.startNum, this.endNum);
 
@@ -107,7 +104,8 @@ export class AppComponent {
       .subscribe( (res) => {
         console.log(res);
         this.resInfo = res;
-        this.drawHistogram();
+        //this.drawHistogram(this.resInfo);
+        this.drawAggregatedBar(this.resInfo);
       });
   }
 
@@ -134,7 +132,7 @@ export class AppComponent {
     } else {
       this.interval = "1h"
     }
-    console.log(this.interval);
+    console.log('interval: ' + this.interval);
   }
 
   getHistogramInfo(urls: Array<string>, startTime: number, endTime: number, interval: string) {
@@ -149,34 +147,132 @@ export class AppComponent {
     return this.http.post(url, {page_view: data});
   }
 
+  drawAggregatedBar(resInfo) {
+    //let bucket1_1 = resInfo['aggregations']['time_bucket']['buckets'][0]['url_bucket']['buckets'];
+    //console.log(bucket1_1);
 
+    var url = [];
 
-  drawHistogram() {
-    var x1 = [];
-    var x2 = [];
-    for (var i = 0; i < 500; i ++) {
-      x1[i] = Math.random();
-      x2[i] = Math.random();
+    let numUrls = this.urls.length;
+    var buckets = resInfo['aggregations']['time_bucket']['buckets'];
+    console.log('number of buckets: ' + buckets.length);
+
+    for (var i = 0; i <= numUrls; i++) {
+      url[i] = new Array();
+      url[i]['x'] = new Array();
+      url[i]['y'] = new Array();
+      url[i]['name'] = 'url' + i;
+      url[i]['type'] = 'bar';
     }
 
-    var trace1 = {
-      x: x1,
-      type: "histogram",
+    /* for(var j=0; j < this.urls.length; j++) {
+      url[j+1] = {x: [], y: [], name: 'url'+j};
+      url[j+1]['x'].push(name);
+      console.log(url[j+1]);
+      url[j+1]['y'].push(buckets[0]['url_bucket']['buckets']['doc_count']);
+      url[j+1]['name'] = "url" + j;
+    } */
+    
+    
+    var url1 = {
+      x: ['time1', 'time2', 'time3'],
+      y: [20, 14, 23],
+      name: 'url1',
+      type: 'bar'
     };
-    var trace2 = {
-      x: x2,
-      type: "histogram",
+    var url2 = {
+      x: ['time1', 'time2', 'time3'],
+      y: [20, 14, 23],
+      name: 'url2',
+      type: 'bar'
     };
-    var data = [trace1, trace2];
+    var url3 = {
+      x: ['time1', 'time2', 'time3'],
+      y: [20, 14, 23],
+      name: 'url3',
+      type: 'bar'
+    };
+    
+    var data = [url[0], url[1], url[2]];
+    
     var layout = {
       barmode: "stack",
       bargap: 0.05, 
       bargroupgap: 0.2,
-      title: "Sampled Results", 
-      xaxis: {title: "Value"}, 
+      title: "Page Views", 
+      xaxis: {title: "Time"}, 
+      yaxis: {title: "Count"}
+    };
+    
+    Plotly.newPlot('chart', data, layout);
+  }
+
+
+  drawHistogram(resInfo) {
+    var arr = [];
+    var url = [];
+    var numBuckets = resInfo['aggregations']['time_bucket']['buckets'].length;
+
+    console.log(numBuckets);
+
+    for (var i = 0; i <= this.urls.length; i++) {
+      arr[i+1] = new Array();
+      for(var j=0; j< numBuckets; j++) {
+        arr[i+1][j] = Math.random();
+      }
+    }
+
+    for(var i=0; i <= this.urls.length; i++) {
+      url[i+1] = new Object();
+      url[i+1] = {
+        x: arr[i+1],
+        type: "histogram",
+        name: "url" + i,
+      }
+    }
+
+    var data = [url[1], url[2], url[3]];
+    var layout = {
+      barmode: "stack",
+      bargap: 0.05, 
+      bargroupgap: 0.2,
+      title: "Page Views", 
+      xaxis: {title: "Time"}, 
       yaxis: {title: "Count"}
     };
     Plotly.newPlot("chart", data, layout);
+
+    /* var arr = [];
+    var url = [];
+    for (var i = 0; i <= this.urls.length; i++) {
+      arr[i+1] = new Array();
+      for(var j=0; j<100; j++) {
+        arr[i+1][j] = Math.random();
+      }
+    }
+
+    for(var i=0; i <= this.urls.length; i++) {
+      url[i+1] = new Object();
+      url[i+1] = {
+        x: arr[i+1],
+        type: "histogram",
+        name: "url" + i,
+      }
+    }
+
+    var data = [url[1], url[2], url[3]];
+    var layout = {
+      barmode: "stack",
+      bargap: 0.05, 
+      bargroupgap: 0.2,
+      title: "Page Views", 
+      xaxis: {title: "Time"}, 
+      yaxis: {title: "Count"}
+    };
+    Plotly.newPlot("chart", data, layout);*/
+
+    
+
 
   }
 
