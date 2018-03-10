@@ -1,11 +1,13 @@
 # elasticsearch-histogram
 Full stack app using Ruby on Rails 5.1 to query Elasticsearch, and display results in a histogram using Angular 5 and the Plotly.js charting library
 
+
 ## Getting Started
 
 These instructions allow for running the app on your local machine. 
 
 The application is split into separate server (rails-backend) and client (angular-frontend) directories.
+
 
 ### Prerequisites
 
@@ -19,6 +21,7 @@ Npm v5.6.0
 Angular-cli v1.6.8
 Angular v5.2.7
 ```
+
 
 ### Installing Dependencies
 
@@ -40,7 +43,6 @@ cd angular-frontend
 npm install
 ```
 
-Your rails server should now be running on localhost:3000
 
 ### Running the Server
 
@@ -57,6 +59,7 @@ rails server
 ```
 
 Your rails server should now be running on localhost:3000
+
 
 ### Running the Client
 
@@ -75,11 +78,8 @@ ng serve
 Go to localhost:4200 in a browser to test the app
 
 
-
 ## Built With
 
 * [Angular](https://angular.io) - Javascript frontend framework
 * [Ruby on Rails](http://rubyonrails.org) - Ruby server-side framework
 * [Plotly.js](https://plot.ly/javascript/) - Javascript graphing library
-
-
