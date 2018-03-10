@@ -104,8 +104,7 @@ export class AppComponent {
       .subscribe( (res) => {
         console.log(res);
         this.resInfo = res;
-        //this.drawHistogram(this.resInfo);
-        this.drawAggregatedBar(this.resInfo);
+        this.drawHistogram(this.resInfo);
       });
   }
 
@@ -147,23 +146,19 @@ export class AppComponent {
     return this.http.post(url, {page_view: data});
   }
 
-  drawAggregatedBar(resInfo) {
-    //let bucket1_1 = resInfo['aggregations']['time_bucket']['buckets'][0]['url_bucket']['buckets'];
-    //console.log(bucket1_1);
-
-    var url = [];
-
+  drawHistogram(resInfo) {
+    let url = [];
     let numUrls = this.urls.length;
     let buckets = resInfo['aggregations']['time_bucket']['buckets'];
     let bucketNames = [];
     let urlBucketCounts = [];
-    console.log('number of buckets: ' + buckets.length);
+    let data = [];
 
     for(var i = 0; i < buckets.length; i++) {
       bucketNames.push(buckets[i]['key_as_string']);
     }
 
-    for(var i=0; i < numUrls; i++) {
+    for(var i = 0; i < numUrls; i++) {
       urlBucketCounts[i] = new Array();
       urlBucketCounts[i]['counts'] = new Array();
 
@@ -181,9 +176,6 @@ export class AppComponent {
           urlBucketCounts[i]['counts'].push(count);
         }
       }
-
-      
-      
     }
 
     for (var i = 0; i < numUrls; i++) {
@@ -192,46 +184,14 @@ export class AppComponent {
       url[i]['y'] = urlBucketCounts[i]['counts'];
       url[i]['name'] = this.urls[i];
       url[i]['type'] = 'bar';
-      console.log(url[i]);
 
-      
+      console.log(url[i]);    
+      data.push(url[i]);  
     }
-
-    
-
-    /* for(var j=0; j < this.urls.length; j++) {
-      url[j+1] = {x: [], y: [], name: 'url'+j};
-      url[j+1]['x'].push(name);
-      console.log(url[j+1]);
-      url[j+1]['y'].push(buckets[0]['url_bucket']['buckets']['doc_count']);
-      url[j+1]['name'] = "url" + j;
-    } */
-    
-    
-    var url1 = {
-      x: ['time1', 'time2', 'time3'],
-      y: [20, 14, 23],
-      name: 'url1',
-      type: 'bar'
-    };
-    var url2 = {
-      x: ['time1', 'time2', 'time3'],
-      y: [20, 14, 23],
-      name: 'url2',
-      type: 'bar'
-    };
-    var url3 = {
-      x: ['time1', 'time2', 'time3'],
-      y: [20, 14, 23],
-      name: 'url3',
-      type: 'bar'
-    };
-    
-    var data = [url[0], url[1], url[2]];
     
     var layout = {
       barmode: "stack",
-      bargap: 0.05, 
+      bargap: 0.025, 
       bargroupgap: 0.2,
       title: "Page Views", 
       xaxis: {title: "Time"}, 
@@ -239,75 +199,6 @@ export class AppComponent {
     };
     
     Plotly.newPlot('chart', data, layout);
-  }
-
-
-  drawHistogram(resInfo) {
-    var arr = [];
-    var url = [];
-    var numBuckets = resInfo['aggregations']['time_bucket']['buckets'].length;
-
-    console.log(numBuckets);
-
-    for (var i = 0; i <= this.urls.length; i++) {
-      arr[i+1] = new Array();
-      for(var j=0; j< numBuckets; j++) {
-        arr[i+1][j] = Math.random();
-      }
-    }
-
-    for(var i=0; i <= this.urls.length; i++) {
-      url[i+1] = new Object();
-      url[i+1] = {
-        x: arr[i+1],
-        type: "histogram",
-        name: "url" + i,
-      }
-    }
-
-    var data = [url[1], url[2], url[3]];
-    var layout = {
-      barmode: "stack",
-      bargap: 0.05, 
-      bargroupgap: 0.2,
-      title: "Page Views", 
-      xaxis: {title: "Time"}, 
-      yaxis: {title: "Count"}
-    };
-    Plotly.newPlot("chart", data, layout);
-
-    /* var arr = [];
-    var url = [];
-    for (var i = 0; i <= this.urls.length; i++) {
-      arr[i+1] = new Array();
-      for(var j=0; j<100; j++) {
-        arr[i+1][j] = Math.random();
-      }
-    }
-
-    for(var i=0; i <= this.urls.length; i++) {
-      url[i+1] = new Object();
-      url[i+1] = {
-        x: arr[i+1],
-        type: "histogram",
-        name: "url" + i,
-      }
-    }
-
-    var data = [url[1], url[2], url[3]];
-    var layout = {
-      barmode: "stack",
-      bargap: 0.05, 
-      bargroupgap: 0.2,
-      title: "Page Views", 
-      xaxis: {title: "Time"}, 
-      yaxis: {title: "Count"}
-    };
-    Plotly.newPlot("chart", data, layout);*/
-
-    
-
-
   }
 
 }
