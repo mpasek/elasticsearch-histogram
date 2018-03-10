@@ -154,16 +154,50 @@ export class AppComponent {
     var url = [];
 
     let numUrls = this.urls.length;
-    var buckets = resInfo['aggregations']['time_bucket']['buckets'];
+    let buckets = resInfo['aggregations']['time_bucket']['buckets'];
+    let bucketNames = [];
+    let urlBucketCounts = [];
     console.log('number of buckets: ' + buckets.length);
 
-    for (var i = 0; i <= numUrls; i++) {
-      url[i] = new Array();
-      url[i]['x'] = new Array();
-      url[i]['y'] = new Array();
-      url[i]['name'] = 'url' + i;
-      url[i]['type'] = 'bar';
+    for(var i = 0; i < buckets.length; i++) {
+      bucketNames.push(buckets[i]['key_as_string']);
     }
+
+    for(var i=0; i < numUrls; i++) {
+      urlBucketCounts[i] = new Array();
+      urlBucketCounts[i]['counts'] = new Array();
+
+      for(var j = 0; j < buckets.length; j++) {
+        if(buckets[j].doc_count === 0) {
+          urlBucketCounts[i]['counts'].push(0);
+        } else {
+          let obj = buckets[j]['url_bucket']['buckets'].find(x => x.key === this.urls[i]);
+          let count;
+          if(obj === undefined) {
+            count = 0;
+          } else {
+            count = obj.doc_count;
+          }
+          urlBucketCounts[i]['counts'].push(count);
+        }
+      }
+
+      
+      
+    }
+
+    for (var i = 0; i < numUrls; i++) {
+      url[i] = new Array();
+      url[i]['x'] = bucketNames;
+      url[i]['y'] = urlBucketCounts[i]['counts'];
+      url[i]['name'] = this.urls[i];
+      url[i]['type'] = 'bar';
+      console.log(url[i]);
+
+      
+    }
+
+    
 
     /* for(var j=0; j < this.urls.length; j++) {
       url[j+1] = {x: [], y: [], name: 'url'+j};
