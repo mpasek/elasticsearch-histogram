@@ -5,7 +5,7 @@ Full stack app using Ruby on Rails 5.1 to query Elasticsearch, and display resul
 
 These instructions allow for running the app on your local machine. 
 
-The application is split into separate server (ruby-backend) and client (angular-frontend) directories.
+The application is split into separate server (rails-backend) and client (angular-frontend) directories.
 
 ### Prerequisites
 
