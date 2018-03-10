@@ -15,9 +15,32 @@ Make sure the following are either installed globally on your machine, or in the
 Ruby v2.3.3
 Rails v5.1.5
 Node v8.9.4
+Npm v5.6.0
 Angular-cli v1.6.8
 Angular v5.2.7
 ```
+
+### Installing Dependencies
+
+Install Rails dependencies:
+1. From root of project, go into rails directory
+2. Install dependencies from Gemfile
+
+```
+cd rails-backend
+bundle install
+```
+
+Install Angular dependencies:
+1. From root of project, go into angular directory
+2. Install dependencies from package.json
+
+```
+cd angular-frontend
+npm install
+```
+
+Your rails server should now be running on localhost:3000
 
 ### Running the Server
 
